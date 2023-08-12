@@ -24,6 +24,9 @@ An item that needs to be changed must be specified in a bracket [nameofwhattocha
 ```
 cp .env-example .env
 ```
+```
+PDFNET_KEY = demo:forscaling@gmail.com:7c43ed9a0200000000d7bf1b2e877e61cd2575882006a6bc3b29f7afd8
+```
 
 #### Edit the .env file and add your MySQL username, MySQL password, and DB name
 
