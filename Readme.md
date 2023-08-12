@@ -1,4 +1,4 @@
-# An Api pdf text editor built upon Pdftron SDK
+# An Api Pdf Text Editor Built Upon Pdftron SDK
 
 The aim of this API is to able to edit text content in a pdf. This automation was created to handle text editing for architectural house plans without distortion of the original dimensions of these plans. This API is being built to be consumed by our client app using either fetch API or Ajax request method.
 An item that needs to be changed must be specified in a bracket [nameofwhattochange] inside the pdf document.
