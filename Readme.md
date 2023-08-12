@@ -1,5 +1,7 @@
-# A pdf text editor built with nodejs. The aim of this API is to able to edit text content in a pdf. This automation was created to handle text editing in architectural house plans without distortion of the original dimensions of plans. This API is being built to be consumed by our client app using either fetch API or Ajax request method.
-An item that needs to be changed must be specified in a bracket [nameofwhattochange].
+# A pdf text editor built with nodejs
+
+The aim of this API is to able to edit text content in a pdf. This automation was created to handle text editing in architectural house plans without distortion of the original dimensions of plans. This API is being built to be consumed by our client app using either fetch API or Ajax request method.
+An item that needs to be changed must be specified in a bracket [nameofwhattochange] inside the pdf document.
 
 
 ## How it works
@@ -18,12 +20,12 @@ An item that needs to be changed must be specified in a bracket [nameofwhattocha
 
 ## Application setup
 
-### Coppy .env-example and create your own .env file
+#### Copy .env-example and create your own .env file
 ```
 cp .env-example .env
 ```
 
-### Edit the .env file and add your MySQL username, MySQL password, and DB name
+#### Edit the .env file and add your MySQL username, MySQL password, and DB name
 
 - Create two MySQL databases one for test and the other for development and assign the values of the connection strings to `DB_DATABASE` and `DB_TEST_DATABASE`= respectively.
 
@@ -46,7 +48,7 @@ npm run dev
 ## Code Example Pdf editing
 ```js
  POST
-{{url}}/api/v1/post`
+{{url}}/api/v1/file`
 ```
 
 #### Code Example
@@ -56,15 +58,15 @@ npm run dev
     "client": "James",
     "project": "United state",
     "user_id": ,
-    "design_id": "23456 [Paul](http://localhost:4000/api/v1/file/6/23456)"
+    "design_id": "23456"
 }
 ```
 
-
+#### For demo sub user_id = 1 and design_id = 23456
 ``` js
-GET {{url}}/api/v1/post/user_id/design_id
+GET {{url}}/api/v1/file/user_id/design_id
 ```
 
 #### Response (English)
-returns a force browser file download to client browser
+returns a force browser file download to the client browser
 
