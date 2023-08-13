@@ -8,10 +8,12 @@ An item that needs to be changed must be specified in a bracket [nameofwhattocha
 - This API takes either a GET or POST
 - whichever request is received this API takes user_id and design_id to get the archive file that was uploaded in the admin dashboard using the desingn_id and user_id as constraints for searching file.
 - After retrieving the accurate archive, we unzip this archive file into a new custom dir located inside the /public/static path
+- Note this /public/static is playground where archive is extracted to, pdf text editing takes places inside here. On successfully file processing this extracted archive is delate from this path, for the purpose of keeping the disk clean.
 - The extracted dir is scanned in order to get all building plans filenames with the .pdf extension to avoid any kind of error.
 - Note: Each pdf file has a placeholder that needs to be automatically filled with the name of the client and proposed residential location. These fields that need to be filled with these data as already been specified in pdf by the architect.
 - iterate over the pdf files for each pdf it fills with  clientname and the project placeholder with the client's proposed residential location.
-- on successful file editing the extracted file is zipped and sent back to the client as file download.
+- on successful file editing the extracted file is zipped. This ziped file is then save inside the /public/files path where zip archive live.
+- Finally, the created zip is sent as response to the client in form of forced browser download.
   
 
 ## Node Version
