@@ -73,14 +73,14 @@ class FileController {
         __dirname,
         `${pathname}/files/${data.file}`,
       )
-
-      // Getting Archeive filename for proper path mapping
-      const folderName = path.parse(getRequestedFilepath).name
+      const subpathname = path.parse(getRequestedFilepath).name
 
       // Archeive Folder will be extracted into this extractArchivePathname
       const customFilename = `Formcast_House_Plan_${
         data.design_id
       }_[${crypto.randomBytes(3).toString('hex')}]`
+
+      // Note: archive is extracted into this dir
       const extractArchivePathname = `${pathname}/static/${customFilename}`
 
       const extractFile = await FileController.extractArchive(
@@ -91,7 +91,7 @@ class FileController {
       // await FileController.runCAD2PDFExecultor(
       //   extractFile,
       //   extractArchivePathname,
-      //   folderName,
+      //   subpathname,
       // )
 
       let saveFilePathname = ''
@@ -102,7 +102,7 @@ class FileController {
           } else {
             saveFilePathname = path.resolve(
               __dirname,
-              `${extractArchivePathname}/${folderName}`,
+              `${extractArchivePathname}/${subpathname}`,
               extractFile[filename],
             )
 
@@ -135,7 +135,7 @@ class FileController {
   static async runCAD2PDFExecultor(
     listOfFilenames,
     customFilename,
-    innerFoldername,
+    subpathname,
   ) {
     const IsRVTFile = function (inputFile) {
       let rvt_input = false
@@ -147,20 +147,18 @@ class FileController {
       return rvt_input
     }
 
-    const pathname = `${customFilename}/${innerFoldername}/cad_files`
+    const pathname = `${customFilename}/${subpathname}/cad_files`
     const main = async () => {
       try {
-        // await PDFNet.addResourceSearchPath('../../lib/')
+        await PDFNet.addResourceSearchPath(
+          path.resolve(__dirname, '../../public/CADModuleWindows/Lib/'),
+        )
         if (!(await PDFNet.CADModule.isModuleAvailable())) {
           console.log('using the PDFNet.addResourceSearchPath() function.\n')
           return
         }
 
         for (let filename = 0; filename < listOfFilenames.length; filename++) {
-          console.log({
-            log: 'logging some cad files here',
-            data: listOfFilenames[filename],
-          })
           if (
             path.parse(listOfFilenames[filename]).ext !== '.rvt' ||
             path.parse(listOfFilenames[filename]).ext !== '.dwg'
@@ -306,13 +304,11 @@ class FileController {
             console.log(err)
           } else {
             console.log('Delete:', filePath)
-            // fs.rmdir(filePath, { recursive: true })
           }
         })
       })
       .catch((error) => {
-        res.statusCode = 500
-        res.end(error)
+        console.log(error)
       })
   }
 }

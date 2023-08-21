@@ -1,0 +1,64 @@
+{
+    "fontFileMappings": {
+        "isocp.shx": [ "arial.ttf", "Roboto-Light.ttf", "NotoSans-Light.ttf" ],
+        "simplex.shx": [ "arial.ttf", "Roboto-Light.ttf", "NotoSans-Light.ttf" ],
+        "romans.shx": [ "arial.ttf", "Roboto-Light.ttf", "NotoSans-Light.ttf" ],
+        "gbcbig.shx": [ "simsun.ttc", "NotoSansSC-VF.ttf" ],
+        "chineset.shx": [ "mingliu.ttc", "NotoSansTC-VF.ttf" ],
+        "bigfont.shx": [ "msmincho.ttc", "msgothic.ttc", "NotoSansJP-VF.ttf" ],
+        "extfont.shx": [ "msmincho.ttc", "msgothic.ttc", "NotoSansJP-VF.ttf" ],
+        "extfont2.shx": [ "msmincho.ttc", "msgothic.ttc", "NotoSansJP-VF.ttf" ],
+        "@extfont2.shx": [ "msmincho.ttc", "msgothic.ttc", "NotoSansJP-VF.ttf" ],
+        "whgdtxt.shx": [ "batang.ttc", "malgun.ttf", "NotoSansKR-VF.ttf" ],
+        "whgtxt.shx": [ "batang.ttc", "malgun.ttf", "NotoSansKR-VF.ttf" ],
+        "whtgtxt.shx": [ "batang.ttc", "malgun.ttf", "NotoSansKR-VF.ttf" ],
+        "whtmtxt.shx": [ "batang.ttc", "malgun.ttf", "NotoSansKR-VF.ttf" ]
+    },
+    "fallbackFonts": {
+        "monospaced":[ "cour.ttf", "NotoSansMono-Light.ttf" ],
+        "proportional": [ "arial.ttf", "NotoSans-Light.ttf" ],
+
+        "chineseSimplified": {
+            "monospaced": [ "simsun.ttc", "NotoSansSC-VF.ttf" ],
+            "proportional": [ "simsun.ttc", "NotoSansSC-VF.ttf" ]
+        },
+        "chineseTraditional": {
+            "monospaced": [ "mingliu.ttc", "NotoSansTC-VF.ttf" ],
+            "proportional": [ "mingliu.ttc", "NotoSansTC-VF.ttf" ]
+        },
+        "japanese": {
+            "monospaced": [ "msmincho.ttc", "msgothic.ttc", "NotoSansJP-VF.ttf" ],
+            "proportional": [ "msmincho.ttc", "msgothic.ttc", "NotoSansJP-VF.ttf" ]
+        },
+        "korean": {
+            "monospaced": [ "batang.ttc", "malgun.ttf", "NotoSansKR-VF.ttf" ],
+            "proportional": [ "batang.ttc", "malgun.ttf", "NotoSansKR-VF.ttf" ]
+        },
+        "thai": {
+            "monospaced": [ "angsana.ttc", "NotoSansThai-Light.ttf" ],
+            "proportional": [ "angsana.ttc", "NotoSansThai-Light.ttf" ]
+        },
+        "arabic": {
+            "monospaced": [ "cour.ttf", "NotoNaskhArabic-Regular.ttf" ],
+            "proportional": [ "arial.ttf", "NotoNaskhArabic-Regular.ttf" ]
+        },
+        "hebrew": {
+            "monospaced": [ "cour.ttf", "NotoSansHebrew-Light.ttf" ],
+            "proportional": [ "arial.ttf", "NotoSansHebrew-Light.ttf" ]
+        },
+        "symbol": {
+        },
+        "greek": {
+        },
+        "turkish": {
+        },
+        "vietnamese": {
+        },
+        "baltic": {
+        },
+        "russian": {
+        },
+        "easteurope": {
+        }
+    }
+}
