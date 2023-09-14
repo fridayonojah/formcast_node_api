@@ -13,7 +13,7 @@ function errorMiddleware(error, req, res, next) {
     ...(data && data),
   }
 
-  res.status(status).send(error)
+  res.json({status: false, message: error})
 }
 
 module.exports = errorMiddleware

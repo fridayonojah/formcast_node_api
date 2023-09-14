@@ -2,8 +2,8 @@ const query = require('../databases/db')
 const { multipleColumnSet } = require('../utils/common.utils')
 
 class DownloaderModel {
-  find = async (params = {}) => {
-    let sql = `SELECT * FROM files_tbl ORDER BY id DESC`
+  find = async (params = {}, file_tbl = 'file') => {
+    let sql = `SELECT * FROM ${file_tbl} ORDER BY id DESC`
     if (!Object.keys(params).length) {
       return await query(sql)
     }
@@ -13,10 +13,10 @@ class DownloaderModel {
     return await query(sql, [...values])
   }
 
-  findOne = async (params) => {
+  findOne = async (params, tbl_name = 'file') => {
     const { columnSet, values } = multipleColumnSet(params)
 
-    const sql = `SELECT * FROM file
+    const sql = `SELECT * FROM ${tbl_name}
     WHERE ${columnSet}`
 
     const result = await query(sql, [...values])
@@ -30,11 +30,47 @@ class DownloaderModel {
     return await query(sql_query, [design_id, user_id])
   }
 
-  create = async ({ client, project, design_id, user_id }) => {
-    const sql = `INSERT INTO client_tbl 
+  create = async (
+    { client, project, design_id, user_id },
+    tbl_name = 'client_tbl',
+  ) => {
+    const sql = `INSERT INTO ${tbl_name} 
         (client, project, design_id, user_id) VALUES(?,?,?,?)`
 
     const result = await query(sql, [client, project, design_id, user_id])
+    return result
+  }
+
+  downloadedItems = async ({
+    client,
+    project,
+    design_id,
+    user_id,
+    file_download_name,
+  }) => {
+    const sql = `INSERT INTO downloads 
+        (client, project, design_id, user_id, file_download_name) VALUES(?,?,?,?,?)`
+
+    const result = await query(sql, [
+      client,
+      project,
+      design_id,
+      user_id,
+      file_download_name,
+    ])
+    return result
+  }
+
+  store_files = async ({ file, design_id, plan }) => {
+    const sql = `INSERT INTO file (file, design_id, plan) VALUES(?,?,?)`
+
+    const result = await query(sql, [file, design_id, plan])
+    return result
+  }
+
+  delete = async (user_id) => {
+    const sql = `DELETE FROM client_tbl WHERE user_id = ?`
+    const result = await query(sql, [user_id])
     return result
   }
 }
