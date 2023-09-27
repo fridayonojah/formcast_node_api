@@ -2,19 +2,16 @@ const createError = require('http-errors')
 const DownloaderModel = require('../models/downloaderModel')
 
 module.exports = {
-  async designExist(req, res, next) {
-    const { design_id } = req.body
-    console.log(design_id)
-
-    // check if design id exist
-    const checkDesignId = await DownloaderModel.findOne(
-      { design_id: design_id },
-      'buildings',
+  async orderCodeExist(req, res, next) {
+    const order_code = req.params.order_code
+    const checkOrderCode = await DownloaderModel.findOne(
+      { order_code: order_code },
+      'orders',
     )
 
-    if (!checkDesignId) {
+    if (!checkOrderCode) {
       return next(
-        createError.NotFound('Design Id is not associated to any design!'),
+        createError.NotFound('Resource with order code can not be processed!'),
       )
     }
     next()

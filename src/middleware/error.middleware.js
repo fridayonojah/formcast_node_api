@@ -6,14 +6,14 @@ function errorMiddleware(error, req, res, next) {
   //if status is 500 change the message to internal srver error
   message = status === 500 || !message ? 'Internal server error' : message
 
-  error = {
-    type: 'error',
-    status,
-    message,
-    ...(data && data),
-  }
+  // error = {
+  //   type: 'error',
+  //   status,
+  //   message,
+  //   ...(data && data),
+  // }
 
-  res.json({status: false, message: error})
+  res.json({status: false, message})
 }
 
 module.exports = errorMiddleware

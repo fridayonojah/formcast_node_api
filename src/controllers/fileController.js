@@ -1,5 +1,9 @@
+const ejs = require('ejs')
+const child_process = require('child_process')
+const path = require('path')
 const DownloaderModel = require('../models/downloaderModel')
 const FileService = require('../services/file_service')
+const { exit } = require('process')
 
 class FileController {
   /**
@@ -8,11 +12,17 @@ class FileController {
    * @param {*} res
    * @returns passes control to @excultePdfnetReplacer
    */
-  static async getClientFiles(req, res) {
+  static async getClientFiles(req, res, next) {
     const getClientResource = await DownloaderModel.getClientDetails(
-      req.params.user_id,
-      req.params.design_id,
+      req.params.order_code,
     )
+
+    if (getClientResource.length === 0)
+      return res.json({
+        status: false,
+        message:
+          'Resource cound not be proccessed now. Please try again later!',
+      })
     await FileService.excultePdfnetReplacer(getClientResource, res)
   }
 
@@ -59,6 +69,23 @@ class FileController {
       status: false,
       message: 'Error occured while trying to upload datas',
     })
+  }
+
+  static async downloadDesign(req, res, next) {
+    const order_code = req.params.order_code
+
+    // get file from download tb based on order_code
+    const getFromDb = await DownloaderModel.findOne(
+      { order_code: order_code },
+      'downloads',
+    )
+
+    const getRequestDesign = path.resolve(
+      __dirname,
+      `../../public/downloads/${getFromDb.file_process_name}`,
+    )
+
+    res.download(getRequestDesign)
   }
 }
 

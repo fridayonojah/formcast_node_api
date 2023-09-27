@@ -13,7 +13,7 @@ class DownloaderModel {
     return await query(sql, [...values])
   }
 
-  findOne = async (params, tbl_name = 'file') => {
+  findOne = async (params, tbl_name = 'files') => {
     const { columnSet, values } = multipleColumnSet(params)
 
     const sql = `SELECT * FROM ${tbl_name}
@@ -21,13 +21,18 @@ class DownloaderModel {
 
     const result = await query(sql, [...values])
 
-    return result[0]
+    return result.fieldCount == 0
+      ? 'Something went wrong. Please contact our admin'
+      : result[0]
   }
 
-  getClientDetails = async (user_id, design_id) => {
-    const sql_query = `SELECT * FROM file AS file INNER JOIN client_tbl AS client ON 
-            file.design_id = client.design_id WHERE file.design_id = ? AND client.user_id = ?`
-    return await query(sql_query, [design_id, user_id])
+  getClientDetails = async (order_code) => {
+    const sql_query = `SELECT orders.client, orders.project, orders.order_code,
+     orders.design_id, files.file
+        FROM orders 
+        INNER JOIN files 
+        ON orders.design_id = files.design_id WHERE orders.order_code = ?`
+    return await query(sql_query, [order_code])
   }
 
   create = async (
@@ -41,23 +46,11 @@ class DownloaderModel {
     return result
   }
 
-  downloadedItems = async ({
-    client,
-    project,
-    design_id,
-    user_id,
-    file_download_name,
-  }) => {
+  downloadedItems = async ({ order_code, file_process_name }) => {
     const sql = `INSERT INTO downloads 
-        (client, project, design_id, user_id, file_download_name) VALUES(?,?,?,?,?)`
+        (order_code, file_process_name) VALUES(?,?)`
 
-    const result = await query(sql, [
-      client,
-      project,
-      design_id,
-      user_id,
-      file_download_name,
-    ])
+    const result = await query(sql, [order_code, file_process_name])
     return result
   }
 

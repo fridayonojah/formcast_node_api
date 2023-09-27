@@ -6,7 +6,6 @@ const AdmZip = require('adm-zip')
 const { PDFNet } = require('@pdftron/pdfnet-node')
 const createError = require('http-errors')
 const DownloaderModel = require('../models/downloaderModel')
-const response = require('../utils/response')
 
 class FileService {
   /**
@@ -19,43 +18,40 @@ class FileService {
   static async excultePdfnetReplacer(clientDetail, res) {
     clientDetail.map(async (data) => {
       const pathname = '../../public'
-
       const getRequestedFilepath = path.resolve(
         __dirname,
         `${pathname}/uploads/${data.file}`,
       )
 
-      // Archeive Folder will be extracted into this extractArchivePathname
+      // zip file will be extracted into custom dirname this custom dir will be created inside the downloads dir
       const customFilename = `Formcast_House_Plan_${
         data.design_id
       }_[${crypto.randomBytes(3).toString('hex')}]`
 
-      // Note: archive is extracted into this dir
-      const extractArchivePathname = `${pathname}/downloads/${customFilename}`
+      // Requested design zip file will be extracted into the custom filename dir inside downloads
+      const pathToRequestedExtractZip = `${pathname}/downloads/${customFilename}`
 
-      const extractFile = await FileService.extractArchive(
+      // Here we are ouputing all the filenames inside pathToRequestedExtractZip
+      const getAllFilenameInDir = await FileService.extractArchive(
         res,
         getRequestedFilepath,
-        extractArchivePathname,
+        pathToRequestedExtractZip,
       )
-
-      const downloaderContext = {
-        client: `${data.client}`,
-        project: `${data.project}`,
-        user_id: `${data.user_id}`,
-        design_id: `${data.design_id}`,
-      }
 
       let saveFilePathname = ''
       const main = async () => {
-        for (let filename = 0; filename < extractFile.length; filename++) {
-          if (path.parse(extractFile[filename]).ext !== '.pdf') {
+        for (
+          let filename = 0;
+          filename < getAllFilenameInDir.length;
+          filename++
+        ) {
+          if (path.parse(getAllFilenameInDir[filename]).ext !== '.pdf') {
             continue
           } else {
             saveFilePathname = path.resolve(
               __dirname,
-              `${extractArchivePathname}/formcast/pdfs/`,
-              extractFile[filename],
+              `${pathToRequestedExtractZip}/formcast/pdfs/`,
+              getAllFilenameInDir[filename],
             )
 
             const pdfdoc = await PDFNet.PDFDoc.createFromFilePath(
@@ -65,8 +61,8 @@ class FileService {
             const replacer = await PDFNet.ContentReplacer.create()
             const page = await pdfdoc.getPage(1)
 
-            await replacer.addString('CLIENT', downloaderContext['client'])
-            await replacer.addString('PROJECT', downloaderContext['project'])
+            await replacer.addString('CLIENT', `${data.client}`)
+            await replacer.addString('PROJECT', `${data.project}`)
             await replacer.process(page)
 
             pdfdoc.save(
@@ -77,12 +73,15 @@ class FileService {
         }
       }
 
-      await FileService.PDFNetEndpoint(
-        main,
-        extractArchivePathname,
-        downloaderContext,
-        res,
-      )
+      const file_payload = {
+        pdfFun: main,
+        pathToextractZip: pathToRequestedExtractZip,
+        order_code: data.order_code,
+        filenames: getAllFilenameInDir,
+        customZipname: customFilename,
+      }
+
+      await FileService.PDFNetEndpoint(file_payload, res)
     })
   }
 
@@ -93,7 +92,7 @@ class FileService {
   static async runCAD2PDFExecultor(
     listOfFilenames,
     customFilename,
-    subpathname,
+    subdirname = 'formcast',
   ) {
     const IsRVTFile = function (inputFile) {
       let rvt_input = false
@@ -105,7 +104,7 @@ class FileService {
       return rvt_input
     }
 
-    const pathname = `${customFilename}/${subpathname}/cad_files`
+    const cadFilespathname = `${customFilename}/${subdirname}/cad_files`
     const main = async () => {
       try {
         await PDFNet.addResourceSearchPath(
@@ -125,7 +124,7 @@ class FileService {
 
           const inputFilePath = path.resolve(
             __dirname,
-            pathname,
+            cadFilespathname,
             listOfFilenames[filename],
           )
 
@@ -146,16 +145,23 @@ class FileService {
             await PDFNet.Convert.fromCAD(doc, inputFilePath)
           }
 
-          const outFilePath = path.resolve(__dirname, pathname, out_filename)
+          const outFilePath = path.resolve(
+            __dirname,
+            cadFilespathname,
+            out_filename,
+          )
           await doc.save(outFilePath, PDFNet.SDFDoc.SaveOptions.e_linearized)
         }
       } catch (err) {
-        throw createError.InternalServerError('Error proessing cad files')
+        throw createError.InternalServerError('Error converting cad files')
       }
     }
 
+    // PDFNet.runWithCleanup(main, process.env.PDFNET_KEY)
     PDFNet.runWithCleanup(main, process.env.PDFNET_KEY)
-      .catch(function (error) {})
+      .catch(function (error) {
+        console.log('Error: ' + JSON.stringify(error))
+      })
       .then(function () {
         return PDFNet.shutdown()
       })
@@ -205,10 +211,6 @@ class FileService {
       // call file reader handler
       return await FileService.readZipArchive(archivepathname)
     } catch (e) {
-      res.json({
-        status: false,
-        message: 'Something went wrong. Download can not be process right now!',
-      })
       throw createError.InternalServerError(
         `Error occured when trying to extract archive file. ${e}`,
       )
@@ -222,15 +224,30 @@ class FileService {
    * @param {*} pathname file to be download by client
    * @param {*} res force download of requested file
    */
-  static async PDFNetEndpoint(main, pathname, downloaderContext, res) {
+  static async PDFNetEndpoint(file_process_payload, res) {
     try {
-      await PDFNet.runWithCleanup(main, process.env.PDFNET_KEY)
+      // This exculte cad files conversion
+      // await this.runCAD2PDFExecultor(
+      //   file_process_payload['filenames'],
+      //   file_process_payload['customZipname'],
+      // )
+
+      // This is execute pdf conversions
+      await PDFNet.runWithCleanup(
+        file_process_payload['pdfFun'],
+        process.env.PDFNET_KEY,
+      )
       await PDFNet.shutdown()
 
-      const filePath = path.resolve(__dirname, pathname)
+      const filePath = path.resolve(
+        __dirname,
+        file_process_payload['pathToextractZip'],
+      )
       const outputFile = path.resolve(
         __dirname,
-        `../../public/downloads/${path.parse(pathname).name}.zip`,
+        `../../public/downloads/${
+          path.parse(file_process_payload['pathToextractZip']).name
+        }.zip`,
       )
 
       const zip = new AdmZip()
@@ -238,37 +255,28 @@ class FileService {
       zip.writeZip(outputFile)
 
       if (fs.existsSync(outputFile)) {
-        // delete folder from playground folder [download]
-        await rm(filePath, { recursive: true })
+        await rm(filePath, { recursive: true }) // delete folder from playground folder [download]
 
         // store downloader record in db for admin management
-        downloaderContext.file_download_name = `${
-          path.parse(outputFile).name
-        }.zip`
-        const store_downloader_info = await DownloaderModel.downloadedItems(
-          downloaderContext,
-        )
+        const store_downloader_info = await DownloaderModel.downloadedItems({
+          order_code: file_process_payload['order_code'],
+          file_process_name: `${path.parse(outputFile).name}.zip`,
+        })
 
         if (store_downloader_info) {
-          await DownloaderModel.delete(downloaderContext['user_id'])
           return res.json({
             status: true,
-            message: 'Download is proccessing!',
-            file: outputFile,
+            message: `Paid Designs are ready for Download!`,
           })
         }
-        throw createError.InternalServerError(
-          'Connection failed to be reached!',
-        )
       }
     } catch (error) {
       res.json({
         status: false,
-        message: 'Some thing went wrong. please try again later',
+        message:
+          'An error occured. Please contact our admin if you can not download Paid Design',
       })
-      throw createError.InternalServerError(
-        `Something went wrong. please try again later ${error}`,
-      )
+      throw error.message
     }
   }
 }

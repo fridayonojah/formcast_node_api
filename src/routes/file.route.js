@@ -14,20 +14,26 @@ router.all('/', (req, res) => {
 })
 
 router.get(
-  '/:user_id/:design_id',
-  [check.designExist],
+  '/:order_code',
+  [check.orderCodeExist],
   asyncMiddleware(fileController.getClientFiles),
+)
+
+router.get(
+  '/download_design/:order_code',
+  [check.orderCodeExist],
+  asyncMiddleware(fileController.downloadDesign),
 )
 
 router.post(
   '/store',
-  [upload, check.designExist],
+  [upload],
   asyncMiddleware(fileController.uploadDownloadableFiles),
 )
 
 router.post(
   '/client',
-  [check.designExist],
+
   asyncMiddleware(fileController.createDetails),
 )
 module.exports = router
