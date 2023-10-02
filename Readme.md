@@ -1,19 +1,48 @@
 # An Api Pdf Text Editor Built Upon Pdftron SDK
 
-The aim of this API is to able to edit text content in a pdf. This automation was created to handle text editing for architectural house plans without distortion of the original dimensions of these plans. This API is being built to be consumed by our client app using either fetch API or Ajax request method.
+The aim of this API is to enable the editing of text content in a PDF. This automation was created to handle text editing for architectural house plans without distortion of the original dimensions of these plans.
 An item that needs to be changed must be specified in a bracket [nameofwhattochange] inside the pdf document.
 
 
 ## How it works
-- This API takes either a GET or POST
-- whichever request is received this API takes user_id and design_id to get the archive file that was uploaded in the admin dashboard using the desingn_id and user_id as constraints for searching file.
-- After retrieving the accurate archive, we unzip this archive file into a new custom dir located inside the /public/static path
-- Note this /public/static is playground where archive is extracted to, pdf text editing takes places inside here. On successfully file processing this extracted archive is delate from this path, for the purpose of keeping the disk clean.
-- The extracted dir is scanned in order to get all building plans filenames with the .pdf extension to avoid any kind of error.
-- Note: Each pdf file has a placeholder that needs to be automatically filled with the name of the client and proposed residential location. These fields that need to be filled with these data as already been specified in pdf by the architect.
-- iterate over the pdf files for each pdf it fills with  clientname and the project placeholder with the client's proposed residential location.
-- on successful file editing the extracted file is zipped. This ziped file is then save inside the /public/files path where zip archive live.
-- Finally, the created zip is sent as response to the client in form of forced browser download.
+- Receive an order_code from the client
+- check if the DB if there is an order that exists with that order_code
+#### Code Example
+```js
+ GET
+{{url}}/api/v1/file/order_code`
+```
+
+```js
+  API Responses 
+{
+    "client": "James",
+    "project": "James construction company",
+    "user_id": 2,
+    "ordered_design": "2 BEDROOM DUPLEX"
+    "file": "formcast_house_plan.zip"
+}
+```
+
+- Send the ordered file to the pdf text editing function
+- get the order file from our node.js file system
+- editing all the PDF plans in the zip file changing the client name to order code client and project to order project name 
+
+```js
+  send a response to the client on a successful PDF text edit
+{
+    "status": true,
+    "message" "files are ready for download. Please visit your dashboard"
+}
+```
+
+```js
+  send a response to the client on an error PDF text edit
+{
+    "status": false,
+    "message" "something went wrong. please try again later!"
+}
+```
   
 
 ## Node Version
@@ -48,30 +77,3 @@ npm start
 ```
 npm run dev
 ```
-
-
-## Code Example Pdf editing
-```js
- POST
-{{url}}/api/v1/file`
-```
-
-#### Code Example
-
-```js
-{
-    "client": "James",
-    "project": "United state",
-    "user_id": ,
-    "design_id": "23456"
-}
-```
-
-#### For demo sub user_id =6 and design_id = 23456
-``` js
-GET {{url}}/api/v1/file/user_id/design_id
-```
-
-#### Response (English)
-returns a force browser file download to the client browser
-
