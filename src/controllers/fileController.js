@@ -1,9 +1,6 @@
-const ejs = require('ejs')
-const child_process = require('child_process')
 const path = require('path')
 const DownloaderModel = require('../models/downloaderModel')
 const FileService = require('../services/file_service')
-const { exit } = require('process')
 
 class FileController {
   /**

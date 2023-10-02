@@ -227,10 +227,10 @@ class FileService {
   static async PDFNetEndpoint(file_process_payload, res) {
     try {
       // This exculte cad files conversion
-      // await this.runCAD2PDFExecultor(
-      //   file_process_payload['filenames'],
-      //   file_process_payload['customZipname'],
-      // )
+      await this.runCAD2PDFExecultor(
+        file_process_payload['filenames'],
+        file_process_payload['customZipname'],
+      )
 
       // This is execute pdf conversions
       await PDFNet.runWithCleanup(
@@ -274,9 +274,9 @@ class FileService {
       res.json({
         status: false,
         message:
-          'An error occured. Please contact our admin if you can not download Paid Design',
+          'An error occured. Please contact our admin if you can not download Paid Design!',
       })
-      throw error.message
+      throw createError.InternalServerError(error)
     }
   }
 }
